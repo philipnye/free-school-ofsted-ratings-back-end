@@ -11,12 +11,16 @@ from collections import OrderedDict
 import urllib
 from bs4 import BeautifulSoup
 
+#scraperwiki.sqlite.execute("drop table admin_totals")
+#scraperwiki.sqlite.execute("drop table Last_successful_ratings_summary")
+#scraperwiki.sqlite.execute("drop table Last_successful_school_details")
+#scraperwiki.sqlite.execute("drop table Today_ratings_summary")
+#scraperwiki.sqlite.execute("drop table Today_school_details")
+
 Ofsted_url_stub = "http://www.ofsted.gov.uk/inspection-reports/find-inspection-report/provider/ELS/"
-import_url="https://premium.scraperwiki.com/mse5vbk/i7mrbh7eb5ovppc/sql/?q=select%20%0A%09URN%2C%0A%20%20%20%20schooltype%2C%0A%20%20%20%20schoolname%2C%0A%20%20%20%20schoolname_with_note_symbol%2C%0A%20%20%20%20phase%2C%0A%20%20%20%20LA%2C%0A%20%20%20%20opendate_full%2C%0A%20%20%20%20opendate_short%2C%0A%20%20%20%20inspection_rating%2C%0A%20%20%20%20inspection_rating2%2C%0A%20%20%20%20publication_date%2C%0A%20%20%20%20publication_date_long%2C%0A%20%20%20%20published_recent%2C%0A%20%20%20%20inspection_date%2C%0A%20%20%20%20inspection_date_long%2C%0A%20%20%20%20URL%2C%0A%20%20%20%20include%2C%0A%20%20%20%20open_closed%2C%0A%20%20%20%20notes%2C%0A%20%20%20%20note_symbol%0Afrom%20School_details%0Aorder%20by%20URN"
+import_url="https://premium.scraperwiki.com/mse5vbk/i7mrbh7eb5ovppc/sql/?q=select%0A%09URN%2C%0A%20%20%20%20schooltype%2C%0A%20%20%20%20schoolname%2C%0A%20%20%20%20schoolname_with_note_symbol%2C%0A%20%20%20%20phase%2C%0A%20%20%20%20LA%2C%0A%20%20%20%20open_date%2C%0A%20%20%20%20inspection_rating%2C%0A%20%20%20%20inspection_rating2%2C%0A%20%20%20%20publication_date%2C%0A%20%20%20%20publication_date_long%2C%0A%20%20%20%20published_recent%2C%0A%20%20%20%20inspection_date%2C%0A%20%20%20%20inspection_date_long%2C%0A%20%20%20%20URL%2C%0A%20%20%20%20include%2C%0A%20%20%20%20open_closed%2C%0A%20%20%20%20notes%2C%0A%20%20%20%20note_symbol%0Afrom%20School_details%0Aorder%20by%20urn"
 
-#pulls in results of free schools xlrd compiler
-
-json = requests.get(import_url).json() #pulls in json and converts to json that can be used in python
+json = requests.get(import_url, verify=False).json() #pulls in json and converts to json that can be used in python
 
 NumberOfSchools = len(json)     #nb includes closed schools and yet-to-open schools
 get_pass="Pass"     #changed to fail if calling a page fails, or we get an error in working with data from a page
@@ -105,26 +109,25 @@ def ofsted_scraper(get_pass):
                     else:           #this scenario will occur where e.g. an academy conversion letter is posted on the Ofsted website, but no sec 5 or learning and skills inspection has been carried out yet
                         school["inspection_rating2"] = "n/a"
                         school["inspection_date"]= "n/a"
-                        school["inspection_date_long"]= datetime(1900, 1, 1, 0, 0).date()
+                        school["inspection_date_long"]= None
                         school["publication_date"]= "n/a"
-                        school["publication_date_long"]= datetime(1900, 1, 1, 0, 0).date()
+                        school["publication_date_long"]= None
                         school["published_recent"]= "n/a"
                         if school["schooltype"]=="Free school":
-                            school["inspection_rating"] = "No section 5 inspection yet"
+                            school["inspection_rating"] = "No section 5 inspection"
                         elif school["schooltype"]== "Sponsored academy" or "Converter academy":
-                            school["inspection_rating"] = "No section 5 inspection yet as an academy"
+                            school["inspection_rating"] = "No section 5 inspection as an academy"
             else:
                 school["include"]=False
-                school["inspection_rating"] = "No section 5 inspection yet"
+                school["inspection_rating"] = "No section 5 inspection"
                 school["inspection_rating2"] = "n/a"
                 school["inspection_date"]= "n/a"
-                school["inspection_date_long"]= datetime(1900, 1, 1, 0, 0).date()
+                school["inspection_date_long"]= None
                 school["publication_date"]= "n/a"
-                school["publication_date_long"]= datetime(1900, 1, 1, 0, 0).date()
+                school["publication_date_long"]= None
                 school["published_recent"]= "n/a"                     #we record a get error if page cannot be accessed
         except:
             get_pass="Fail"         #fails if calling page fails, or some other erros occurs when working with page data 
-        print school
     return get_pass
 
 def ratings_counts_and_percentages():
@@ -277,7 +280,7 @@ def yesterday_validation_tests(NumberOfOpenSec5School,spreadsheet_pass):
                 if rating["ratingtype"]=="Overall" and rating["rating"]==yest_rating:
                     today_count=rating["ratingcount"]
                     break       #hopefully just breaks iteration over today's rating data
-            if abs(yest_count-today_count)>5:       #if we have more than 5 new ratings of any given type since the last successful run
+            if abs(yest_count-today_count)>10:       #if we have more than 5 new ratings of any given type since the last successful run
                 yesterday_ratings_pass="Fail"    
                 break
             else:
