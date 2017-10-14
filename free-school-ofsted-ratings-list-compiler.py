@@ -12,9 +12,9 @@ from bs4 import BeautifulSoup
 scraperwiki.sqlite.execute("drop table School_details")
 
 notes={
-    "138259":{"annotation":"Hartsbrook E-ACT, pre-closure","symbol":"*", "note":"This school reopened as Brook House Primary School (URN: 141209) after being taken over by a new sponsor. It will feature in the open schools table once it has been inspected under its new URN."},
-    "141209":{"annotation":"Hartsbrook E-ACT, post-closure","symbol":"*", "note":"This school was previously known as Hartsbrook E-Act Free School. It changed name, and was given a new URN, when it was taken over by a new sponsor."},
-    "138259":{"annotation":"St Michael's Secondary School","symbol":"**", "note":"**St Michael's Secondary School ceased to be a standalone school in September 2016, merging with an existing academy, Camborne Science and International Academy."},
+    "138259":{"annotation":"Hartsbrook E-ACT, pre-closure","symbol":"*", "note":"This school reopened as Brook House Primary School (URN: 141209) after being taken over by a new sponsor."},
+    "141209":{"annotation":"Brook House Primary School (Hartsbrook E-ACT, post-closure)","symbol":"*", "note":"This school was previously known as Hartsbrook E-Act Free School. It changed name, and was given a new URN, when it was taken over by a new sponsor."},
+    "138780":{"annotation":"St Michael's Secondary School","symbol":"**", "note":"St Michael's Secondary School ceased to be a standalone school in September 2016, merging with an existing academy, Camborne Science and International Academy."},
     "143648":{"annotation":"Harpenden Free School","symbol":"***", "note":"***Harpenden Free School previously operated under URN 138561."}
     }
 
