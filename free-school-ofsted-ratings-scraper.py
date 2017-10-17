@@ -61,7 +61,7 @@ def ofsted_scraper(get_pass):
             pgtitle = soup.find("title").get_text()
             if  not pgtitle == "Ofsted | Page not found ":
                 if not soup.find("span", "ins-rep-date") == None:
-                    if school["open_closed"] == "Open":     # checks open status of schools. Only open, pre-16 schools which have had a sec 5 inspection are included
+                    if school["open_closed"] == "Open" or "Open, but proposed to close":     # checks open status of schools. Only open, pre-16 schools which have had a sec 5 inspection are included
                         school["include"]=True
                     else:
                         school["include"]=False
