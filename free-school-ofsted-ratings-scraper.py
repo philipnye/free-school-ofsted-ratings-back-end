@@ -59,9 +59,9 @@ def ofsted_scraper(get_pass):
             html = requests.get(Ofsted_full_url)
             soup = BeautifulSoup(html.content, "html.parser")
             pgtitle = soup.find("title").get_text()
-            if  not pgtitle == "Ofsted | Page not found ":
+            if not pgtitle == "Ofsted | Page not found ":
                 if not soup.find("span", "ins-rep-date") == None:
-                    if school["open_closed"] == "Open" or "Open, but proposed to close":     # checks open status of schools. Only open, pre-16 schools which have had a sec 5 inspection are included
+                    if school["open_closed"] == "Open" or school["open_closed"] == "Open, but proposed to close":     # checks open status of schools. Only open, pre-16 schools which have had a sec 5 inspection are included
                         school["include"]=True
                     else:
                         school["include"]=False
@@ -115,7 +115,7 @@ def ofsted_scraper(get_pass):
                         school["published_recent"]= "n/a"
                         if school["schooltype"]=="Free school":
                             school["inspection_rating"] = "No section 5 inspection"
-                        elif school["schooltype"]== "Sponsored academy" or "Converter academy":
+                        elif school["schooltype"]== "Sponsored academy" or school["schooltype"]=="Converter academy":
                             school["inspection_rating"] = "No section 5 inspection as an academy"
             else:
                 school["include"]=False
