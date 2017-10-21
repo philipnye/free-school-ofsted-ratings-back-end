@@ -1,0 +1,158 @@
+-- HEADLINE FIGURES
+select
+  Max(Run_date),
+  Run_date_short,
+  NumberOfSchools,
+  NumberOfClosedSchools,
+  NumberOfUnopenedSchools,
+  NumberOfOpenUninspectedSchools,
+  NumberOfOpenSec5Schools,
+  NumberOfOpenLSSchools
+from admin_totals
+where
+  Spreadsheet_pass='Pass' AND
+  Saving_pass='Pass'
+
+-- DATA FOR TABLES
+-- Open schools
+select
+  published_recent,
+  inspection_rating2,
+  schooltype,
+  LA,
+  URL,
+  schoolname_with_note_symbol,
+  URN,
+  schoolname,
+  open_closed,
+  opendate_full,
+  inspection_date_long,
+  inspection_rating,
+  opendate_short,
+  phase,
+  publication_date,
+  publication_date_long,
+  include,
+  notes,
+  note_symbol,
+  inspection_date
+from Last_successful_school_details
+where
+  include=1
+order by
+  inspection_rating2,
+  schoolname
+
+-- Closed schools
+select
+  published_recent,
+  inspection_rating2,
+  schooltype,
+  LA,
+  URL,
+  schoolname_with_note_symbol,
+  URN,
+  schoolname,
+  open_closed,
+  opendate_full,
+  inspection_date_long,
+  inspection_rating,
+  opendate_short,
+  phase,
+  publication_date,
+  publication_date_long,
+  include,
+  notes,
+  note_symbol,
+  inspection_date
+from Last_successful_school_details
+where
+  open_closed='Closed'
+order by
+  inspection_rating2,
+  schoolname
+
+-- DATA FOR PIE CHARTS
+-- Overall
+select
+  ID,
+  ratingtype,
+  ratingname,
+  rating,
+  percentage,
+  ratingcount
+from Last_successful_ratings_summary
+where
+  ratingtype='Overall' AND
+  percentage>0
+order by rating
+
+-- Primary
+select
+  ID,
+  ratingtype,
+  ratingname,
+  rating,
+  percentage,
+  ratingcount
+from Last_successful_ratings_summary
+where
+  ratingtype='Primary' AND
+  percentage>0
+order by rating
+
+-- Secondary
+select
+  ID,
+  ratingtype,
+  ratingname,
+  rating,
+  percentage,
+  ratingcount
+from Last_successful_ratings_summary
+where
+  ratingtype='Secondary' AND
+  percentage>0
+order by rating
+
+-- ALl-through
+select
+  ID,
+  ratingtype,
+  ratingname,
+  rating,
+  percentage,
+  ratingcount
+from Last_successful_ratings_summary
+where
+  ratingtype='All-through' AND
+  percentage>0
+order by rating
+
+-- Alternative provision
+select
+  ID,
+  ratingtype,
+  ratingname,
+  rating,
+  percentage,
+  ratingcount
+from Last_successful_ratings_summary
+where
+  ratingtype='Alternative provision' AND
+  percentage>0
+order by rating
+
+-- Special
+select
+  ID,
+  ratingtype,
+  ratingname,
+  rating,
+  percentage,
+  ratingcount
+from Last_successful_ratings_summary
+where
+  ratingtype='Special' AND
+  percentage>0
+order by rating
