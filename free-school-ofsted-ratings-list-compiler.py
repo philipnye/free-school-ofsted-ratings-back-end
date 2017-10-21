@@ -15,7 +15,10 @@ notes={
     "138259":{"annotation":"Hartsbrook E-ACT, pre-closure","symbol":"*", "note":"This school reopened as Brook House Primary School (URN: 141209) after being taken over by a new sponsor."},
     "141209":{"annotation":"Brook House Primary School (Hartsbrook E-ACT, post-closure)","symbol":"*", "note":"This school was previously known as Hartsbrook E-Act Free School. It changed name, and was given a new URN, when it was taken over by a new sponsor."},
     "138780":{"annotation":"St Michael's Secondary School","symbol":"**", "note":"St Michael's Secondary School ceased to be a standalone school in September 2016, merging with an existing academy, Camborne Science and International Academy."},
-    "143648":{"annotation":"Harpenden Free School","symbol":"***", "note":"***Harpenden Free School previously operated under URN 138561."}
+    "138561":{"annotation":"Harpenden Free School, pre-closure","symbol":"***", "note":"This school joined an academy trust in September 2016, and is recorded by the DfE as a technical closure. It now operates under URN 143648."},
+    "143648":{"annotation":"Harpenden Free School, post-closure","symbol":"***", "note":"Harpenden Free School previously operated under URN 138561."},
+    "139786":{"annotation":"Royal Greenwich Trust School Academy","symbol":"****", "note":"Royal Greenwich Trust School Academy closed in August 2016 and became Royal Greenwich Trust School (URN: 143927)."},
+    "143927":{"annotation":"Royal Greenwich Trust School","symbol":"****", "note":"Royal Greenwich Trust School previously operated under URN 139786."}
     }
 
 schooldetails={
@@ -50,7 +53,7 @@ def compiler():
                 URN = row["URN"]
                 schooldetails["URN"]=URN
                 schooldetails["schoolname"] = row["EstablishmentName"]
-                try:        #handles the fact that notes[URN]["symbol"] will only exist for a limited number of URNs            
+                try:        #handles the fact that notes[URN]["symbol"] will only exist for a limited number of URNs
                     schooldetails["schoolname_with_note_symbol"] = schooldetails["schoolname"]+notes[URN]["symbol"]
                     schooldetails["notes"]=notes[URN]["note"]
                     schooldetails["note_symbol"]=notes[URN]["symbol"]
@@ -73,9 +76,7 @@ def compiler():
                         schooldetails["phase"] = "All-through"
                     else:
                         schooldetails["phase"] = row["PhaseOfEducation (name)"]
-                # print schooldetails
-                if not schooldetails["URN"]=="138561":                # this is old Harpenden Free School, which we don't want to show as a closed school as there wasn't even a change in sponsor
-                    scraperwiki.sql.save(["URN"], schooldetails, "School_details")
+                scraperwiki.sql.save(["URN"], schooldetails, "School_details")
     return schooldetails
 
 compiler()

@@ -93,8 +93,20 @@ def ofsted_scraper(get_pass):
                     else:
                         school["published_recent"]= "No"
                 else:
-                    school["include"]=False         #even schools that have had learning and skilsl inspections we don't want to include in our results
-                    if soup.find(text=" Learning and skills inspection report ") is not None:
+                    school["include"]=False         #even schools that have had college/learning and skills inspections we don't want to include in our results
+                    if soup.find(text=" College inspection report ") is not None:
+                        school["inspection_rating"] = "College inspection report - findings not scraped"
+                        school["inspection_rating2"] = "College inspection report - findings not scraped"
+                        school["inspection_date"] = soup.find_all("td", class_="date")[0].get_text()
+                        school["inspection_date_long"] = datetime.strptime(school["inspection_date"], "%d %b %Y").date()
+                        school["publication_date"] = soup.find_all("td", class_="date")[1].get_text()
+                        school["publication_date_long"]= datetime.strptime(school["publication_date"], "%d %b %Y").date()
+                        published_days = date.today()-school["publication_date_long"]   #converts publication date string to a datetime object, then a date object and calculates difference from today's date
+                        if published_days.days<=7:       #strips 'days' from published.days and saves the number of days if <= a week
+                            school["published_recent"]= str(published_days.days)        #saved as a string so that we don't have mixed data types for this key, and get errors when saving in SqlAlchemy
+                        else:
+                            school["published_recent"]= "No"
+                    elif soup.find(text=" Learning and skills inspection report ") is not None:
                         school["inspection_rating"] = "Learning and skills inspection - findings not scraped"
                         school["inspection_rating2"] = "Learning and skills inspection - findings not scraped"
                         school["inspection_date"] = soup.find_all("td", class_="date")[0].get_text()
@@ -127,7 +139,7 @@ def ofsted_scraper(get_pass):
                 school["publication_date_long"]= None
                 school["published_recent"]= "n/a"                     #we record a get error if page cannot be accessed
         except:
-            get_pass="Fail"         #fails if calling page fails, or some other erros occurs when working with page data 
+            get_pass="Fail"         #fails if calling page fails, or some other error occurs when working with page data
     return get_pass
 
 def ratings_counts_and_percentages():
@@ -173,7 +185,7 @@ def ratings_counts_and_percentages():
             elif school["open_closed"]== "Proposed to open":
                 NumberOfUnopenedSchools +=1
             else:       #not included in tables, but not closed nor proposed to open
-                if school["inspection_rating"]=="Learning and skills inspection - findings not scraped":
+                if school["inspection_rating"]=="College inspection report - findings not scraped" or school["inspection_rating"]=="Learning and skills inspection - findings not scraped":
                     NumberOfOpenLSSchools+=1
                 else:
                     NumberOfOpenUninspectedSchools+=1
@@ -205,7 +217,7 @@ def ratings_counts_and_percentages():
     Checksum_open_inspected_schools = ratings[0]["ratingcount"]+ratings[1]["ratingcount"]+ratings[2]["ratingcount"]+ratings[3]["ratingcount"]
     Checksum_school_statuses = NumberOfOpenSec5Schools+NumberOfClosedSchools+NumberOfUnopenedSchools+NumberOfOpenLSSchools+NumberOfOpenUninspectedSchools
     admin_totals["NumberOfSchools"]  = NumberOfSchools
-    admin_totals["NumberOfOpenSec5Schools"]=NumberOfOpenSec5Schools  
+    admin_totals["NumberOfOpenSec5Schools"]=NumberOfOpenSec5Schools
     admin_totals["NumberOfClosedSchools"]  =NumberOfClosedSchools
     admin_totals["NumberOfUnopenedSchools"]  =NumberOfUnopenedSchools
     admin_totals["NumberOfOpenUninspectedSchools"]  =NumberOfOpenUninspectedSchools
@@ -268,7 +280,7 @@ def yesterday_validation_tests(NumberOfOpenSec5School,spreadsheet_pass):
                     yesterday_inspected_pass="Fail"
                 else:
                     yesterday_inspected_pass="Pass"
-                break               
+                break
     except:
         yesterday_inspected_pass="No data to compare against"
     try:    #catches error where Last_successful_ratings_summary table doesn't exist (e.g. we've cleared dataset)
@@ -281,7 +293,7 @@ def yesterday_validation_tests(NumberOfOpenSec5School,spreadsheet_pass):
                     today_count=rating["ratingcount"]
                     break       #hopefully just breaks iteration over today's rating data
             if abs(yest_count-today_count)>10:       #if we have more than 5 new ratings of any given type since the last successful run
-                yesterday_ratings_pass="Fail"    
+                yesterday_ratings_pass="Fail"
                 break
             else:
                 yesterday_ratings_pass="Pass"
@@ -293,22 +305,22 @@ def yesterday_validation_tests(NumberOfOpenSec5School,spreadsheet_pass):
     admin_totals["Yesterday_ratings_pass"]=yesterday_ratings_pass
     admin_totals["Spreadsheet_pass"]=spreadsheet_pass
     return spreadsheet_pass
-        
-def saving(spreadsheet_pass):        
+
+def saving(spreadsheet_pass):
     saving_pass="Pass"        #true, as saving code sets this to false only if saving fails
     for school in json:     #saves today's data, whether or not validation checks have passed. Records whether saving has been successful in saving_pass
         try:
             scraperwiki.sql.save(["URN"], school, "Today_school_details")
         except:
             print "Error saving row: " + str(school)
-            saving_pass="Fail"               
+            saving_pass="Fail"
     for rating in ratings:      #saves today's ratings summary, whether or not validation checks have passed. Records whether saving has been successful in saving_pass
         try:
             print rating
             scraperwiki.sql.save(["ID"], rating, "Today_ratings_summary")
         except:
             print "Error saving row: " + str(rating)
-            saving_pass="Fail"    
+            saving_pass="Fail"
     if spreadsheet_pass == "Pass" and saving_pass == "Pass": #if data has passed all validation checks and saving has worked with no errors, data and ratings summary are saved as last successful records
         for school in json:
             scraperwiki.sql.save(["URN"], school, "Last_successful_school_details")
@@ -333,7 +345,7 @@ admin_totals=OrderedDict([
     ("NumberOfOpenUninspectedSchools","intentionally_blank"),
     ("NumberOfOpenSec5Schools","intentionally_blank"),
     ("NumberOfOpenLSSchools","intentionally_blank"),
-    ("Checksum_open_inspected_schools","intentionally_blank"), 
+    ("Checksum_open_inspected_schools","intentionally_blank"),
     ("Ratings_test_pass","intentionally_blank"),
     ("Percentage_total_overall","intentionally_blank"),
     ("Percentage_total_primary","intentionally_blank"),
