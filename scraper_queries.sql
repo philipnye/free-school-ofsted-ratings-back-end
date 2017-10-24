@@ -1,4 +1,4 @@
--- HEADLINE FIGURES
+-- ADMIN TOTALS
 select
   Max(Run_date),
   Run_date_short,
@@ -156,3 +156,55 @@ where
   ratingtype='Special' AND
   percentage>0
 order by rating
+
+
+-- -- PULL OUT KEY FIGURES
+-- -- Most recent
+-- select 
+--     Max(Run_date), *
+-- from admin_totals
+
+-- -- Previous
+-- select 
+--     Max(Run_date), *
+-- from admin_totals
+-- WHERE Run_date < ( SELECT MAX( Run_date ) FROM admin_totals )
+
+-- -- One week ago
+-- select 
+--     *
+-- from admin_totals
+-- where date(Run_date)=date('now','-7 days');
+
+-- -- Last successful
+-- select 
+--     Max(Run_date), *
+-- from admin_totals
+-- where 
+--     Spreadsheet_pass="Pass" AND 
+--     Saving_pass="Pass"
+
+
+-- -- TEST PRODUCING RATING PERCENTAGES
+-- select 
+--     phase,
+--     inspection_rating2,
+--     count(1) count,
+--     count(1)*100/(
+--         select count(1) 
+--         from last_successful_school_details
+--         where 
+--             inspection_rating2 is not 'n/a' and
+--             inspection_rating2 is not 'Learning and skills inspection - findings not scraped' and 
+--             phase='Primary' and 
+--             open_closed='Open') percentage
+-- from last_successful_school_details
+-- where 
+--     inspection_rating2 is not 'n/a'
+--     and inspection_rating2 is not 'Learning and skills inspection - findings not scraped'
+--     and phase='Primary'
+--     and open_closed='Open'
+-- group by
+--     inspection_rating2
+-- order by
+--     inspection_rating2;
