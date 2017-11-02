@@ -44,7 +44,7 @@ schooldetails={
 }
 
 def compiler():
-    csvfile = requests.get("https://raw.githubusercontent.com/philipnye/free-school-ofsted-ratings-back-end/master/data/edubasealldata20171007.csv")
+    csvfile = requests.get("https://raw.githubusercontent.com/philipnye/free-school-ofsted-ratings-back-end/master/data/edubasealldata20171101.csv")
     csvfile = csvfile.iter_lines()      # is required in order for csv file to be read correctly, without errors caused by new-line characters
     reader = csv.DictReader(csvfile)
     for row in reader:
