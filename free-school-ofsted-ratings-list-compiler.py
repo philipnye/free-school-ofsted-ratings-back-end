@@ -43,8 +43,17 @@ schooldetails={
     "note_symbol":"Not yet scraped"
 }
 
+url1 = "https://github.com/philipnye/free-school-ofsted-ratings-back-end/tree/master/data"
+url2= "https://raw.githubusercontent.com/philipnye/free-school-ofsted-ratings-back-end/master/data/"
+
 def compiler():
-    csvfile = requests.get("https://raw.githubusercontent.com/philipnye/free-school-ofsted-ratings-back-end/master/data/edubasealldata20171101.csv")
+    html = requests.get(url1).text
+    soup = BeautifulSoup(html, 'html.parser')
+    for a in soup.find_all('a'):
+        if str(a.get('title')).endswith('csv'):     # tag.get('attr') in Beautiful soup works as get works with a Python dictionary, returning None where attr is undefined.
+            filename=str(a.get('title'))
+            url3 = url2+filename        # expectation is that there is only one data file
+    csvfile = requests.get(url3)
     csvfile = csvfile.iter_lines()      # is required in order for csv file to be read correctly, without errors caused by new-line characters
     reader = csv.DictReader(csvfile)
     for row in reader:
