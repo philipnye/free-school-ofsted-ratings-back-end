@@ -23,33 +23,36 @@ import_url="https://premium.scraperwiki.com/mse5vbk/i7mrbh7eb5ovppc/sql/?q=selec
 json = requests.get(import_url, verify=False).json() #pulls in json and converts to json that can be used in python
 
 NumberOfSchools = len(json)     #nb includes closed schools and yet-to-open schools
+
 get_pass="Pass"     #changed to fail if calling a page fails, or we get an error in working with data from a page
 NumberOfOpenSec5School=0
-ratings =[
-    {"ID":0.1,"ratingtype":"Overall","rating":1, "ratingname":"Outstanding", "ratingcount":0, "percentage":0},
-    {"ID":0.2,"ratingtype":"Overall","rating":2, "ratingname":"Good", "ratingcount":0,"percentage":0},
-    {"ID":0.3,"ratingtype":"Overall","rating":3, "ratingname":"Requires improvement", "ratingcount":0,"percentage":0},
-    {"ID":0.4,"ratingtype":"Overall","rating":4, "ratingname":"Inadequate", "ratingcount":0,"percentage":0},
-    {"ID":1.1,"ratingtype":"Primary","rating":1, "ratingname":"Outstanding", "ratingcount":0, "percentage":0},
-    {"ID":1.2,"ratingtype":"Primary","rating":2, "ratingname":"Good", "ratingcount":0,"percentage":0},
-    {"ID":1.3,"ratingtype":"Primary","rating":3, "ratingname":"Requires improvement", "ratingcount":0,"percentage":0},
-    {"ID":1.4,"ratingtype":"Primary","rating":4, "ratingname":"Inadequate", "ratingcount":0,"percentage":0},
-    {"ID":2.1,"ratingtype":"Secondary","rating":1, "ratingname":"Outstanding", "ratingcount":0, "percentage":0},
-    {"ID":2.2,"ratingtype":"Secondary","rating":2, "ratingname":"Good", "ratingcount":0,"percentage":0},
-    {"ID":2.3,"ratingtype":"Secondary","rating":3, "ratingname":"Requires improvement", "ratingcount":0,"percentage":0},
-    {"ID":2.4,"ratingtype":"Secondary","rating":4, "ratingname":"Inadequate", "ratingcount":0,"percentage":0},
-    {"ID":3.1,"ratingtype":"All-through","rating":1, "ratingname":"Outstanding", "ratingcount":0, "percentage":0},
-    {"ID":3.2,"ratingtype":"All-through","rating":2, "ratingname":"Good", "ratingcount":0,"percentage":0},
-    {"ID":3.3,"ratingtype":"All-through","rating":3, "ratingname":"Requires improvement", "ratingcount":0,"percentage":0},
-    {"ID":3.4,"ratingtype":"All-through","rating":4, "ratingname":"Inadequate", "ratingcount":0,"percentage":0},
-    {"ID":4.1,"ratingtype":"Alternative provision","rating":1, "ratingname":"Outstanding", "ratingcount":0, "percentage":0},
-    {"ID":4.2,"ratingtype":"Alternative provision","rating":2, "ratingname":"Good", "ratingcount":0,"percentage":0},
-    {"ID":4.3,"ratingtype":"Alternative provision","rating":3, "ratingname":"Requires improvement", "ratingcount":0,"percentage":0},
-    {"ID":4.4,"ratingtype":"Alternative provision","rating":4, "ratingname":"Inadequate", "ratingcount":0,"percentage":0},
-    {"ID":5.1,"ratingtype":"Special","rating":1, "ratingname":"Outstanding", "ratingcount":0, "percentage":0},
-    {"ID":5.2,"ratingtype":"Special","rating":2, "ratingname":"Good", "ratingcount":0,"percentage":0},
-    {"ID":5.3,"ratingtype":"Special","rating":3, "ratingname":"Requires improvement", "ratingcount":0,"percentage":0},
-    {"ID":5.4,"ratingtype":"Special","rating":4, "ratingname":"Inadequate", "ratingcount":0,"percentage":0}]
+ratings = [{"ratingtype":None,"rating":None, "ratingname":None, "ratingcount":None}]
+admin_totals=OrderedDict([
+    ("Run_date","intentionally_blank"),
+    ("Run_date_short","intentionally_blank"),
+    ("Get_pass","intentionally_blank"),
+    ("NumberOfSchools","intentionally_blank"),
+    ("Checksum_school_statuses","intentionally_blank"),
+    ("Count_test_pass","intentionally_blank"),
+    ("NumberOfClosedSchools","intentionally_blank"),
+    ("NumberOfUnopenedSchools","intentionally_blank"),
+    ("NumberOfOpenUninspectedSchools","intentionally_blank"),
+    ("NumberOfOpenSec5Schools","intentionally_blank"),
+    ("NumberOfOpenLSSchools","intentionally_blank"),
+    ("Checksum_open_inspected_schools","intentionally_blank"),
+    ("Ratings_test_pass","intentionally_blank"),
+    ("Percentage_total_overall","intentionally_blank"),
+    ("Percentage_total_primary","intentionally_blank"),
+    ("Percentage_total_secondary","intentionally_blank"),
+    ("Percentage_total_all_through","intentionally_blank"),
+    ("Percentage_total_AP","intentionally_blank"),
+    ("Percentage_total_special","intentionally_blank"),
+    ("Percentage_test_pass","intentionally_blank"),
+    ("Yesterday_inspected_pass","intentionally_blank"),
+    ("Yesterday_ratings_pass","intentionally_blank"),
+    ("Spreadsheet_pass","intentionally_blank"),
+    ("Saving_pass","intentionally_blank")
+    ])
 
 def ofsted_scraper(get_pass):
     for school in json:
@@ -143,22 +146,6 @@ def ofsted_scraper(get_pass):
     return get_pass
 
 def ratings_counts_and_percentages():
-    NumberOfOpenSec5Schools=0
-    NumberOfOpenPrimarySec5Schools=0
-    NumberOfOpenSecondarySec5Schools=0
-    NumberOfOpenAllThroughSec5Schools=0
-    NumberOfOpenAPSec5Schools=0
-    NumberOfOpenSpecialSec5Schools=0
-    NumberOfOpenLSSchools=0
-    NumberOfClosedSchools= 0
-    NumberOfUnopenedSchools=0
-    NumberOfOpenUninspectedSchools=0
-    percentage_total_overall = 0
-    percentage_total_primary =0
-    percentage_total_secondary =0
-    percentage_total_all_through =0
-    percentage_total_AP =0
-    percentage_total_special =0
     for school in json:
         if school["include"]==True:
             NumberOfOpenSec5Schools+=1
@@ -265,7 +252,6 @@ def validation_tests(get_pass):
     admin_totals["Ratings_test_pass"]  =ratings_test_pass
     admin_totals["Count_test_pass"]  =count_test_pass
     admin_totals["Percentage_test_pass"]  =percentage_test_pass
-    # admin_totals["Spreadsheet_pass"]  =spreadsheet_pass           #saved in second set of validation tests
     return spreadsheet_pass
 
 def yesterday_validation_tests(NumberOfOpenSec5School,spreadsheet_pass):
@@ -333,32 +319,6 @@ def saving(spreadsheet_pass):
 
 ### MAIN PROGRAMME###
 get_pass=ofsted_scraper(get_pass)   #we will use get_pass status in validation tests
-admin_totals=OrderedDict([
-    ("Run_date","intentionally_blank"),
-    ("Run_date_short","intentionally_blank"),
-    ("Get_pass","intentionally_blank"),
-    ("NumberOfSchools","intentionally_blank"),
-    ("Checksum_school_statuses","intentionally_blank"),
-    ("Count_test_pass","intentionally_blank"),
-    ("NumberOfClosedSchools","intentionally_blank"),
-    ("NumberOfUnopenedSchools","intentionally_blank"),
-    ("NumberOfOpenUninspectedSchools","intentionally_blank"),
-    ("NumberOfOpenSec5Schools","intentionally_blank"),
-    ("NumberOfOpenLSSchools","intentionally_blank"),
-    ("Checksum_open_inspected_schools","intentionally_blank"),
-    ("Ratings_test_pass","intentionally_blank"),
-    ("Percentage_total_overall","intentionally_blank"),
-    ("Percentage_total_primary","intentionally_blank"),
-    ("Percentage_total_secondary","intentionally_blank"),
-    ("Percentage_total_all_through","intentionally_blank"),
-    ("Percentage_total_AP","intentionally_blank"),
-    ("Percentage_total_special","intentionally_blank"),
-    ("Percentage_test_pass","intentionally_blank"),
-    ("Yesterday_inspected_pass","intentionally_blank"),
-    ("Yesterday_ratings_pass","intentionally_blank"),
-    ("Spreadsheet_pass","intentionally_blank"),
-    ("Saving_pass","intentionally_blank")
-    ])
 NumberOfOpenSec5School=ratings_counts_and_percentages()
 spreadsheet_pass=validation_tests(get_pass)
 spreadsheet_pass=yesterday_validation_tests(NumberOfOpenSec5School,spreadsheet_pass)
