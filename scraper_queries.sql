@@ -160,46 +160,46 @@ order by rating
 
 -- -- PULL OUT KEY FIGURES
 -- -- Most recent
--- select 
+-- select
 --     Max(Run_date), *
 -- from admin_totals
 
 -- -- Previous
--- select 
+-- select
 --     Max(Run_date), *
 -- from admin_totals
 -- WHERE Run_date < ( SELECT MAX( Run_date ) FROM admin_totals )
 
 -- -- One week ago
--- select 
+-- select
 --     *
 -- from admin_totals
 -- where date(Run_date)=date('now','-7 days');
 
 -- -- Last successful
--- select 
+-- select
 --     Max(Run_date), *
 -- from admin_totals
--- where 
---     Spreadsheet_pass="Pass" AND 
+-- where
+--     Spreadsheet_pass="Pass" AND
 --     Saving_pass="Pass"
 
 
 -- -- TEST PRODUCING RATING PERCENTAGES
--- select 
+-- select
 --     phase,
 --     inspection_rating2,
 --     count(1) count,
 --     count(1)*100/(
---         select count(1) 
+--         select count(1)
 --         from last_successful_school_details
---         where 
+--         where
 --             inspection_rating2 is not 'n/a' and
---             inspection_rating2 is not 'Learning and skills inspection - findings not scraped' and 
---             phase='Primary' and 
+--             inspection_rating2 is not 'Learning and skills inspection - findings not scraped' and
+--             phase='Primary' and
 --             open_closed='Open') percentage
 -- from last_successful_school_details
--- where 
+-- where
 --     inspection_rating2 is not 'n/a'
 --     and inspection_rating2 is not 'Learning and skills inspection - findings not scraped'
 --     and phase='Primary'
@@ -208,3 +208,13 @@ order by rating
 --     inspection_rating2
 -- order by
 --     inspection_rating2;
+
+-- SQLITE WAY OF DOING PARTITION() OVER, TO FIND LATEST INSPECTION RECORD FOR EACH URN
+-- select
+--   q.*
+-- from last_successful_school_details q
+--     join (select urn, max(inspection_date_long) as max_date from last_successful_school_details r group by urn) s
+--         on
+--           q.urn= s.urn and
+--           q.inspection_date_long = s.max_date
+-- group by q.urn
