@@ -1,6 +1,7 @@
 -- INPUT DATA FOR SCRAPER
 select
     URN,
+    LAEstab,
     schooltype,
     schoolname,
     schoolname_with_note_symbol,

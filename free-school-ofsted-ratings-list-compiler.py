@@ -23,6 +23,7 @@ notes={
 
 schooldetails={
     "URN":"Not yet scraped",
+    "LAEstab":"Not yet scraped",
     "schoolname":"Not yet scraped",
     "schoolname_with_note_symbol":"Not yet scraped",
     "schooltype":"Free school",
@@ -61,6 +62,7 @@ def compiler():
             if not (row["TypeOfEstablishment (name)"].lower()==("University technical college").lower() or row["TypeOfEstablishment (name)"].lower()==("Studio schools").lower()):
                 URN = row["URN"]
                 schooldetails["URN"]=URN
+                schooldetails["LAEstab"]=row["LA (code)"]+row["EstablishmentNumber"]
                 schooldetails["schoolname"] = row["EstablishmentName"]
                 try:        #handles the fact that notes[URN]["symbol"] will only exist for a limited number of URNs
                     schooldetails["schoolname_with_note_symbol"] = schooldetails["schoolname"]+notes[URN]["symbol"]
