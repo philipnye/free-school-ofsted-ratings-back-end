@@ -192,13 +192,13 @@ order by rating
 --     count(1) count,
 --     count(1)*100/(
 --         select count(1)
---         from last_successful_school_details
+--         from inspections
 --         where
 --             inspection_rating2 is not 'n/a' and
 --             inspection_rating2 is not 'Learning and skills inspection - findings not scraped' and
 --             phase='Primary' and
 --             open_closed='Open') percentage
--- from last_successful_school_details
+-- from inspections
 -- where
 --     inspection_rating2 is not 'n/a'
 --     and inspection_rating2 is not 'Learning and skills inspection - findings not scraped'
@@ -212,8 +212,8 @@ order by rating
 -- SQLITE WAY OF DOING PARTITION() OVER, TO FIND LATEST INSPECTION RECORD FOR EACH URN
 -- select
 --   q.*
--- from last_successful_school_details q
---     join (select urn, max(inspection_date_long) as max_date from last_successful_school_details r group by urn) s
+-- from inspections q
+--     join (select urn, max(inspection_date_long) as max_date from inspections r group by urn) s
 --         on
 --           q.urn= s.urn and
 --           q.inspection_date_long = s.max_date
