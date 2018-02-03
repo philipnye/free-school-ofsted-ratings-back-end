@@ -2,23 +2,23 @@
 select
     URN,
     LAEstab,
-    schooltype,
-    schoolname,
-    schoolname_with_note_symbol,
-    phase,
+    school_name,
+    note_symbol,
+    notes,
+    school_name_with_note_symbol,
     LA,
+    school_type,
+    phase,
+    open_closed,
     open_date,
+    close_date,
     inspection_rating,
-    inspection_rating2,
+    inspection_rating_text,
     publication_date,
     publication_date_long,
-    published_recent,
     inspection_date,
     inspection_date_long,
-    URL,
-    include,
-    open_closed,
-    notes,
-    note_symbol
+    URL
 from School_details
-order by urn
+where
+    school_type in ('Free schools','Free schools alternative provision','Free schools special','Free schools 16 to 19')
