@@ -158,63 +158,65 @@ where
 order by rating
 
 
--- -- PULL OUT KEY FIGURES
--- -- Most recent
--- select
---     Max(Run_date), *
--- from admin_totals
 
--- -- Previous
--- select
---     Max(Run_date), *
--- from admin_totals
--- WHERE Run_date < ( SELECT MAX( Run_date ) FROM admin_totals )
+-- REFACTOR
+-- PULL OUT KEY FIGURES
+-- Most recent
+select
+    Max(Run_date), *
+from log
 
--- -- One week ago
--- select
---     *
--- from admin_totals
--- where date(Run_date)=date('now','-7 days');
+-- Previous
+select
+    Max(Run_date), *
+from log
+WHERE Run_date < (SELECT MAX(Run_date) FROM log)
 
--- -- Last successful
--- select
---     Max(Run_date), *
--- from admin_totals
--- where
---     Spreadsheet_pass="Pass" AND
---     Saving_pass="Pass"
+-- One week ago
+select
+    *
+from log
+where date(Run_date)=date('now','-7 days');
+
+-- Last successful
+select
+    Max(Run_date), *
+from log
+where
+    Spreadsheet_pass="Pass" AND
+    Saving_pass="Pass"
 
 
--- -- TEST PRODUCING RATING PERCENTAGES
--- select
---     phase,
---     inspection_rating2,
---     count(1) count,
---     count(1)*100/(
---         select count(1)
---         from inspections
---         where
---             inspection_rating2 is not 'n/a' and
---             inspection_rating2 is not 'Learning and skills inspection - findings not scraped' and
---             phase='Primary' and
---             open_closed='Open') percentage
--- from inspections
--- where
---     inspection_rating2 is not 'n/a'
---     and inspection_rating2 is not 'Learning and skills inspection - findings not scraped'
---     and phase='Primary'
---     and open_closed='Open'
--- group by
---     inspection_rating2
--- order by
---     inspection_rating2;
+-- TEST PRODUCING RATING PERCENTAGES
+select
+    phase,
+    inspection_rating,
+    count(1) count,
+    count(1)*100/(
+        select count(1)
+        from inspections
+        where
+            inspection_rating is not 'n/a' and
+            inspection_rating is not 'Learning and skills inspection - findings not scraped' and
+            phase='Primary' and
+            open_closed='Open') percentage
+from inspections
+where
+    inspection_rating is not 'n/a'
+    and inspection_rating is not 'Learning and skills inspection - findings not scraped'
+    and phase='Primary'
+    and open_closed='Open'
+group by
+    inspection_rating
+order by
+    inspection_rating;
 
--- SQLITE WAY OF DOING PARTITION() OVER, TO FIND LATEST INSPECTION RECORD FOR EACH URN
--- select
---   q.*
--- from inspections q
---     join (select urn, max(inspection_date_long) as max_date from inspections r group by urn) s
---         on
---           q.urn= s.urn and
---           q.inspection_date_long = s.max_date
--- group by q.urn
+SQLITE WAY OF DOING PARTITION() OVER, TO FIND LATEST INSPECTION RECORD FOR EACH URN
+select
+  q.*
+from inspections q
+    join (select urn, max(inspection_date_long) as max_date from inspections r group by urn) s
+        on
+          q.urn= s.urn and
+          q.inspection_date_long = s.max_date
+group by q.urn
